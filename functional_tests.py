@@ -1,3 +1,4 @@
+import time
 import unittest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -32,8 +33,19 @@ class NewVisitorTest(unittest.TestCase):
         inputbox.send_keys(Keys.ENTER)
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(any(row.text == '1: buy peacock feathers' for row in rows),
-                        "New to-do item did not appear in table")
+        self.assertIn('1: buy peacock feathers', [row.text for row in rows],
+                        "New to-do item did not appear in table - its text was: \n{}".
+                        format(table.text))
+
+        # User can add another item to the todo list
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('use peacock feathers to make a fly')
+        inputbox.send_keys(Keys.ENTER)
+
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn('1: buy peacock feathers', [row.text for row in rows])
+        self.assertIn('2: use peacock feathers to make a fly', [row.text for row in rows])
 
         self.fail('Finish the test!')
 
