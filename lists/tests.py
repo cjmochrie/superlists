@@ -1,7 +1,7 @@
 from django.core.urlresolvers import resolve
 from django.template.loader import render_to_string
 from django.http import HttpRequest
-from .models import Item
+from .models import Item, ToDoList
 from .views import home_page
 from django.test import TestCase
 
@@ -21,13 +21,22 @@ class HomePageTest(TestCase):
 class ItemModelTest(TestCase):
 
     def test_saving_and_retrieving_items(self):
+
+        list_ = ToDoList()
+        list_.save()
+
         first_item = Item()
         first_item.text = 'The first (ever) list item'
+        first_item.todo_list = list_
         first_item.save()
 
         second_item = Item()
         second_item.text = 'Item the second'
+        second_item.todo_list = list_
         second_item.save()
+
+        saved_list = ToDoList.objects.first()
+        self.assertEqual(saved_list, list_)
 
         saved_items = Item.objects.all()
         self.assertEqual(saved_items.count(), 2)
@@ -35,7 +44,9 @@ class ItemModelTest(TestCase):
         first_saved_item = saved_items[0]
         second_saved_item = saved_items[1]
         self.assertEqual(first_saved_item.text, 'The first (ever) list item')
+        self.assertEqual(first_saved_item.todo_list, list_)
         self.assertEqual(second_saved_item.text, 'Item the second')
+        self.assertEqual(second_saved_item.todo_list, list_)
 
 
 class ListViewTest(TestCase):
@@ -46,8 +57,9 @@ class ListViewTest(TestCase):
 
     def test_displays_all_items(self):
 
-        Item.objects.create(text='itemy 1')
-        Item.objects.create(text='itemy 2')
+        list_ = ToDoList.objects.create()
+        Item.objects.create(text='itemy 1', todo_list=list_)
+        Item.objects.create(text='itemy 2', todo_list=list_)
 
         response = self.client.get('/lists/the-only-list-in-the-world/')
 
