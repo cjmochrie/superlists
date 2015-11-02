@@ -7,18 +7,16 @@ REPO_URL = 'https://github.com/cjmochrie/superlists.git'
 env.key_filename = 'Z:\Dropbox\Projects\droplet_server\cameron.ppk'
 
 
-def deploy(production=False):
-    production = True if production == 'True' else False
-    host = 'superlist' if production else 'superlist-staging'
-    virtualenv_folder = '/home/{}/Envs/superlist'.format(env.user) if production \
-        else '/home/{}/Envs/superlist-staging'.format(env.user)
+def deploy():
 
+    host = env.host
+    virtualenv_folder = '/home/{}/Envs/{}'.format(env.user, host)
     site_folder = '/home/{username}/sites/{host}'.format(username=env.user, host=host)
     source_folder = site_folder + '/source'
     _create_directory_structure_if_necessary(site_folder)
     _get_latest_source(source_folder)
     _update_settings(source_folder, env.host)
-    _update_virtualenv(virtualenv_folder, source_folder, production)
+    _update_virtualenv(virtualenv_folder, source_folder, host)
     _update_static_files(virtualenv_folder, source_folder)
     _update_database(virtualenv_folder, source_folder)
 
@@ -49,13 +47,12 @@ def _update_settings(source_folder, site_name):
     append(settings_path, '\nfrom .secret_key import SECRET_KEY')
 
 
-def _update_virtualenv(virtualenv_folder, source_folder, production):
+def _update_virtualenv(virtualenv_folder, source_folder, env_name):
 
     with prefix('WORKON_HOME=~/Envs'):
         with prefix('export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3'):
             with prefix('source /usr/local/bin/virtualenvwrapper.sh'):
 
-                env_name = 'superlist' if production else 'superlist-staging'
                 if not exists(virtualenv_folder + '/bin/pip'):
                     run('mkvirtualenv --python=/usr/bin/python3 {}'.format(env_name))
                 with prefix('workon {}'.format(env_name)):
