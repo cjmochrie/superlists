@@ -1,0 +1,34 @@
+####
+Staging
+
+sed "s/SITENAME/superlist-staging.cjmochrie.com/g" \
+    deploy_tools/nginx.template.conf | sudo tee \
+    /etc/nginx/sites-available/superlist-staging.cjmochrie.com
+
+sudo ln -s ../sites-available/superlist-staging.cjmochrie.com \
+    /etc/nginx/sites-enabled/superlist-staging.cjmochrie.com
+
+sed "s/SITENAME/superlist-staging.cjmochrie.com/g" \
+    deploy_tools/gunicorn-upstart.template.conf | sudo tee \
+    /etc/init/gunicorn-superlist-staging.cjmochrie.com.conf
+
+sudo service nginx reload
+sudo start gunicorn-superlist-staging.cjmochrie.com
+
+####
+Production
+
+
+sed "s/SITENAME/superlist.cjmochrie.com/g" \
+    deploy_tools/nginx.template.conf | sudo tee \
+    /etc/nginx/sites-available/superlist.cjmochrie.com
+
+sudo ln -s ../sites-available/superlist.cjmochrie.com \
+    /etc/nginx/sites-enabled/superlist.cjmochrie.com
+
+sed "s/SITENAME/superlist.cjmochrie.com/g" \
+    deploy_tools/gunicorn-upstart.template.conf | sudo tee \
+    /etc/init/gunicorn-superlist.cjmochrie.com.conf
+
+sudo service nginx reload
+sudo start gunicorn-superlist.cjmochrie.com
