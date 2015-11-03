@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
+from django.core.exceptions import ValidationError
+
 from .models import Item, ToDoList
 
 
 def home_page(request):
     return render(request, 'home.html')
-
 
 
 def view_list(request, list_id):
@@ -13,9 +14,16 @@ def view_list(request, list_id):
 
 
 def new_list(request):
-
     list_ = ToDoList.objects.create()
-    Item.objects.create(text=request.POST['item_text'], todo_list=list_)
+    item = Item.objects.create(text=request.POST['item_text'], todo_list=list_)
+    try:
+        item.full_clean()
+        item.save()
+    except ValidationError:
+        list_.delete()
+        return render(request, 'home.html',
+                      {'error': "You can't have an empty list item"})
+
     return redirect('/lists/{}/'.format(list_.id))
 
 def add_item(request, list_id):

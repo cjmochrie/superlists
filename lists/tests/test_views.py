@@ -1,9 +1,11 @@
 from django.core.urlresolvers import resolve
 from django.template.loader import render_to_string
 from django.http import HttpRequest
+from django.test import TestCase
+from django.utils.html import escape
+
 from lists.models import Item, ToDoList
 from lists.views import home_page
-from django.test import TestCase
 
 class HomePageTest(TestCase):
 
@@ -16,37 +18,6 @@ class HomePageTest(TestCase):
         response = home_page(request)
         expected_html = render_to_string('home.html')
         self.assertEqual(response.content.decode(), expected_html)
-
-
-class ItemModelTest(TestCase):
-
-    def test_saving_and_retrieving_items(self):
-
-        list_ = ToDoList()
-        list_.save()
-
-        first_item = Item()
-        first_item.text = 'The first (ever) list item'
-        first_item.todo_list = list_
-        first_item.save()
-
-        second_item = Item()
-        second_item.text = 'Item the second'
-        second_item.todo_list = list_
-        second_item.save()
-
-        saved_list = ToDoList.objects.first()
-        self.assertEqual(saved_list, list_)
-
-        saved_items = Item.objects.all()
-        self.assertEqual(saved_items.count(), 2)
-
-        first_saved_item = saved_items[0]
-        second_saved_item = saved_items[1]
-        self.assertEqual(first_saved_item.text, 'The first (ever) list item')
-        self.assertEqual(first_saved_item.todo_list, list_)
-        self.assertEqual(second_saved_item.text, 'Item the second')
-        self.assertEqual(second_saved_item.todo_list, list_)
 
 
 class ListViewTest(TestCase):
@@ -89,11 +60,21 @@ class NewListTest(TestCase):
         self.assertEqual(new_item.text, 'A new list item')
 
     def test_redirects_after_POST(self):
-
         response = self.client.post('/lists/new', data={'item_text': 'A new list item'})
-
         new_list = ToDoList.objects.first()
         self.assertRedirects(response, '/lists/{}/'.format(new_list.id))
+
+    def test_validation_errors_are_sent_back_to_home_page_template(self):
+        response = self.client.post('/lists/new', data={'item_text': ''})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'home.html')
+        expected_error = escape("You can't have an empty list item")
+        self.assertContains(response, expected_error)
+
+    def test_invalid_list_items_arent_saved(self):
+        self.client.post('/lists/new', data={'item_text': ''})
+        self.assertEqual(ToDoList.objects.count(), 0)
+        self.assertEqual(Item.objects.count(), 0)
 
 class NewItemTest(TestCase):
 
