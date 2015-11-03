@@ -11,29 +11,22 @@ def home_page(request):
 
 def view_list(request, list_id):
     todo_list = ToDoList.objects.get(id=list_id)
-    error = None
+    form = ItemForm()
 
     if request.method == 'POST':
-        try:
-            item = Item.objects.create(text=request.POST['text'], todo_list=todo_list)
-            item.full_clean()
-            item.save()
+        form = ItemForm(data=request.POST)
+        if form.is_valid():
+            Item.objects.create(text=request.POST['text'], todo_list=todo_list)
             return redirect(todo_list)
-        except ValidationError:
-            error = "You can't have an empty list item"
 
-    return render(request, 'list.html', {'todo_list': todo_list, 'error': error})
+    return render(request, 'list.html', {'todo_list': todo_list, 'form': form})
 
 
 def new_list(request):
-    list_ = ToDoList.objects.create()
-    item = Item.objects.create(text=request.POST['text'], todo_list=list_)
-    try:
-        item.full_clean()
-        item.save()
-    except ValidationError:
-        list_.delete()
-        return render(request, 'home.html',
-                      {'error': "You can't have an empty list item"})
-
-    return redirect(list_)
+    form = ItemForm(data=request.POST)
+    if form.is_valid():
+        list_ = ToDoList.objects.create()
+        item = Item.objects.create(text=request.POST['text'], todo_list=list_)
+        return redirect(list_)
+    else:
+        return render(request, 'home.html', {'form': form})
