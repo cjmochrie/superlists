@@ -15,7 +15,7 @@ def view_list(request, list_id):
 
     if request.method == 'POST':
         try:
-            item = Item.objects.create(text=request.POST['item_text'], todo_list=todo_list)
+            item = Item.objects.create(text=request.POST['text'], todo_list=todo_list)
             item.full_clean()
             item.save()
             return redirect(todo_list)
@@ -27,7 +27,7 @@ def view_list(request, list_id):
 
 def new_list(request):
     list_ = ToDoList.objects.create()
-    item = Item.objects.create(text=request.POST['item_text'], todo_list=list_)
+    item = Item.objects.create(text=request.POST['text'], todo_list=list_)
     try:
         item.full_clean()
         item.save()
