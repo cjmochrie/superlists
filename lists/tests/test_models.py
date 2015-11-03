@@ -34,6 +34,10 @@ class ItemModelTest(TestCase):
         self.assertEqual(second_saved_item.text, 'Item the second')
         self.assertEqual(second_saved_item.todo_list, list_)
 
+    def test_get_absolute_url(self):
+        list_ = ToDoList.objects.create()
+        self.assertEqual(list_.get_absolute_url(), '/lists/{}/'.format(list_.id))
+
 
 class ListAndItemModelsTest(TestCase):
 
