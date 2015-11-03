@@ -10,3 +10,6 @@ class ToDoList(models.Model):
 class Item(models.Model):
     text = models.TextField(default='')
     todo_list = models.ForeignKey(ToDoList, default=None)
+
+    class Meta:
+        unique_together = ('todo_list', 'text')

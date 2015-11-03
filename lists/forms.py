@@ -14,3 +14,7 @@ class ItemForm(forms.models.ModelForm):
                    'class': 'form-control input-lg'})}
         error_messages = {'text': {'required': EMPTY_ITEM_ERROR}}
 
+    def save(self, for_list):
+        self.instance.todo_list = for_list
+        return super().save()
+

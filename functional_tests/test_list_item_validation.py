@@ -16,7 +16,7 @@ class ItemValidationTest(FunctionalTest):
 
         # The homepage refreshes and an error message appears saying that list items
         # cannot be blank
-        error = self.browser.find_element_by_css_selector('.has_error')
+        error = self.browser.find_element_by_css_selector('.has-error')
         self.assertEqual(error.text, "You can't have an empty list item")
 
         # User tries again, which now works
@@ -28,10 +28,24 @@ class ItemValidationTest(FunctionalTest):
 
         # A similar warning appears
         self.check_for_row_in_list_table('1: Buy milk')
-        error = self.browser.find_element_by_css_selector('.has_error')
+        error = self.browser.find_element_by_css_selector('.has-error')
         self.assertEqual(error.text, "You can't have an empty list item")
 
         # The user can correct it by filling some text in
         self.get_item_input_box().send_keys('Make tea\n')
         self.check_for_row_in_list_table('1: Buy milk')
         self.check_for_row_in_list_table('2: Make tea')
+
+    def test_cannot_add_duplicate_items(self):
+        # User goes to the homepage, starts a new list
+        self.browser.get(self.server_url)
+        self.get_item_input_box().send_keys('Buy wellies\n')
+        self.check_for_row_in_list_table('1: Buy wellies')
+
+        # User accidentally tries to enter a duplicate item
+        self.get_item_input_box().send_keys('Buy wellies\n')
+
+        # User sees a helpful error message
+        self.check_for_row_in_list_table('1: Buy wellies')
+        error = self.browser.find_element_by_css_selector('.has-error')
+        self.assertEqual(error.text, "You've already got this in your list")
