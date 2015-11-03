@@ -35,10 +35,8 @@ class ListViewTest(TestCase):
 
     def test_displays_only_items_for_that_list(self):
         correct_list = ToDoList.objects.create()
-
         Item.objects.create(text='itemy 1', todo_list=correct_list)
         Item.objects.create(text='itemy 2', todo_list=correct_list)
-
         other_list = ToDoList.objects.create()
         Item.objects.create(text='other list item 1', todo_list=other_list)
         Item.objects.create(text='other list item 2', todo_list=other_list)
