@@ -1,7 +1,14 @@
 /**
  * Created by Cameron on 11/3/2015.
  */
+jQuery(document).ready(function() {
 
-$('input').on('keypress', function() {
-    $('.has-error').hide();
+     $('#id_text').on('click', function () {
+        $('.has-error').hide();
+    });
+
+    $('#id_text').on('keypress', function () {
+        $('.has-error').hide();
+    });
+
 });
