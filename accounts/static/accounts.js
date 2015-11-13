@@ -5,6 +5,10 @@ var initialize = function(navigator, user, token, urls) {
         console.log("CLICKED");
     });
 
+    $('#id_logout').on('click', function() {
+        navigator.id.logout();
+    });
+
     navigator.id.watch({
         loggedInUser: user,
         onlogin: function(assertion) {
@@ -15,7 +19,11 @@ var initialize = function(navigator, user, token, urls) {
                 .done(function () { window.location.reload(); })
                 .fail(function() { navigator.id.logout(); });
         },
-        onlogout: function() {}
+        onlogout: function() {
+            $.post(urls.logout, { csrfmiddlewaretoken: token })
+                .done(function() { window.location.reload(); })
+                .fail(function() { navigator.id.logout(); })
+            }
     });
 };
 

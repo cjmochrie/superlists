@@ -21,10 +21,20 @@ class LoginTest(FunctionalTest):
         # The Persona window closes
         self.switch_to_new_window('To-Do')
 
-        # The user can see that she is logged in
-        self.wait_for_element_with_id('id_logout')
-        navbar = self.browser.find_element_by_css_selector('.navbar')
-        self.assertIn('cameron@mockmyid.com', navbar.text)
+        # User can see he is logged in
+        self.wait_to_be_logged_in()
+
+        # After refreshing the page the user still sees he is logged in
+        self.browser.refresh()
+        self.wait_to_be_logged_in()
+
+        # The user logs out
+        self.browser.find_element_by_id('id_logout').click()
+        self.wait_to_be_logged_out()
+
+        # Logged out status persists
+        self.browser.refresh()
+        self.wait_to_be_logged_out()
 
     def switch_to_new_window(self, text_in_title):
         for i in range(60):
@@ -38,5 +48,17 @@ class LoginTest(FunctionalTest):
 
     def wait_for_element_with_id(self, element_id):
         WebDriverWait(self.browser, timeout=30).until(
-            lambda b: b.find_element_by_id(element_id)
+            lambda b: b.find_element_by_id(element_id),
+            'Could not find element with id {}. Page text was: \n{}'.
+            format(element_id, self.browser.find_element_by_tag_name('body').text)
         )
+
+    def wait_to_be_logged_in(self):
+        self.wait_for_element_with_id('id_logout')
+        navbar = self.browser.find_element_by_css_selector('.navbar')
+        self.assertIn('cameron@mockmyid.com', navbar.text)
+
+    def wait_to_be_logged_out(self):
+        self.wait_for_element_with_id('id_login')
+        navbar = self.browser.find_element_by_css_selector('.navbar')
+        self.assertNotIn('cameron@mockmyid.com', navbar.text)
