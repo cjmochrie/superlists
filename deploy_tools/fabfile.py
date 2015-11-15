@@ -68,5 +68,8 @@ def _update_static_files(virtualenv_folder, source_folder):
 
 def _update_database(virtualenv_folder, source_folder):
     run('cd {source_folder} && {virtualenv_folder}/bin/python3 '
+        'manage.py makemigrations --noinput'.format(source_folder=source_folder,
+                                                    virtualenv_folder=virtualenv_folder))
+    run('cd {source_folder} && {virtualenv_folder}/bin/python3 '
         'manage.py migrate --noinput'.format(source_folder=source_folder,
                                              virtualenv_folder=virtualenv_folder))
