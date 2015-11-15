@@ -82,13 +82,12 @@ LOGGING = {
     'handlers': {
         'console': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, '../logging'),
+            'class': 'logging.StreamHandler',
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
         },
     },
     'root': {'level': 'INFO'},
