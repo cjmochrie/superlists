@@ -16,7 +16,6 @@ class AuthenticateTest(TestCase):
         user.username = 'fakeuser'
         user.save()
 
-
     def test_sends_assertion_to_mozilla_with_domain(self, mock_post):
         self.backend.authenticate('an assertion')
         mock_post.assert_called_once_with(
